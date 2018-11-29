@@ -30,7 +30,7 @@ revRange :: (Char, Char) -> [Char]
 revRange = unfoldr fun 
 fun (a, b) 
     | a > b = Nothing 
-    | b == '\NUL' = Just (b, (succ a, b)) 
+    | b == minBound = Just (b, (succ a, b)) 
     | otherwise = Just (b, (a, pred b))
 
 --Main Hw_2 Lib> revRange('\NUL', '\SOH')
@@ -93,10 +93,10 @@ instance Foldable Postorder where
 instance Foldable Levelorder where
     foldMap f tree = foldMap' f (tbf [tree]) where --добавляем в очередь узел
         foldMap' f [] = mempty
-        foldMap' f (x:xs) = f x <> foldMap' f xs
+        foldMap' f (x:xs) = foldMap' f xs <> f x
 --функция создает список вершин при обходе дерева в порядке LevelOrder
         tbf [] = []
-        tbf xs = map nodeValue xs ++ tbf (concat (map leftAndRightNodes xs)) where --map nodeValue xs значения узлов этого уровня добавляются в результирующий список
+        tbf xs = tbf (concat (map leftAndRightNodes xs)) ++ map nodeValue xs  where --map nodeValue xs значения узлов этого уровня добавляются в результирующий список
         --объединяем с другими узлами а затем рекурсивно вызываем tbf, чтобы пройти все уровни дерева.
         --LeftAndRightNodes возвращает список левого и / или правого узлов.
             nodeValue (LevelO (Node _ a _)) = a
